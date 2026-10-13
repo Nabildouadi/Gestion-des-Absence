@@ -1,0 +1,104 @@
+==========================================================
+  GESTION DES ABSENCES 2026 — INSFP ELHIDHAB
+  Professeur Douadi Nabil — (c) 2026 — Tous droits reserves
+==========================================================
+
+1. FICHIERS DU PROJET
+   - index.html      : l'application complete (un seul fichier).
+                       Ouvrez-le dans Google Chrome, Edge ou Firefox.
+   - LICENCE.md       : conditions d'utilisation.
+   - LISEZ-MOI.txt    : ce fichier.
+
+2. ACCES PROFESSEUR
+   Nom d'utilisateur : Profdouadi
+   Mot de passe      : 08082012
+   (le mot de passe peut etre change dans Parametres ; il est
+    stocke sous forme d'empreinte SHA-256, jamais en clair).
+
+3. ACCES STAGIAIRE
+   Identifiant : votre numero de telephone.
+   Mot de passe : les 4 derniers chiffres de votre numero.
+   (info reservee au professeur - ne pas diffuser aux etudiants)
+   L'etudiant consulte sa feuille d'appel et son releve d'absences.
+
+3 bis. POINTAGE DIRECT PAR LE STAGIAIRE (QR)
+   Deux facons de pointer, sans passer par le professeur :
+   a) Ecran d'accueil > onglet "Acces Stagiaire" > bouton
+      "Scanner mon QR Code" (a cote du formulaire de connexion).
+      Le QR est lu, le nom du stagiaire s'affiche, il saisit son mot
+      de passe, la presence est enregistree immediatement et sa
+      feuille d'appel s'ouvre.
+   b) Feuille d'appel > bloc "Pointer ma presence" > bouton
+      "Scanner ma fiche QR" (apres connexion).
+   Regles :
+   - La presence est ecrite aussitot dans la feuille d'appel, avec
+     la date, l'heure et la salle ; rien a enregistrer manuellement.
+   - Un QR inconnu est refuse ; un QR qui n'est pas le vôtre est
+     refuse ; un second pointage dans la meme seance est refuse.
+   - Au-dela de 10 minutes apres le debut du creneau, le pointage est
+     enregistre automatiquement comme "retard".
+   - Le telephone sert d'identifiant : le QR encode le numero de
+     telephone du stagiaire (les anciennes fiches codees GA-0xx
+     fonctionnent toujours).
+
+4. EMPLOI DU TEMPS DES APPELS
+   Dimanche, lundi, mardi, mercredi :
+     08:00 - 10:00 | 10:00 - 12:00 | 13:00 - 15:00 | 15:00 - 16:30
+   Jeudi : 08:00 - 10:00 | 10:00 - 12:00 uniquement
+   Vendredi et samedi : pas d'appel.
+   Le planning est modifiable dans Parametres > Planning hebdomadaire.
+
+5. SCAN QR CODE (PROFESSEUR)
+   - La camera ne fonctionne qu'en local (localhost) ou en HTTPS.
+     Pour scanner depuis un fichier local, ouvrez une invite de
+     commandes dans le dossier du projet et lancez :
+         python -m http.server 8000
+     puis ouvrez http://localhost:8000 dans le navigateur.
+   - Si la camera est refusee ou indisponible, utilisez la saisie
+     manuelle du code ou du numero (bouton "Pointer manuellement").
+   - Un second scan du meme stagiaire dans la meme seance est signale.
+   - Un scan effectue plus de 10 minutes apres le debut du creneau est
+     enregistre automatiquement comme "retard".
+
+6. SUIVI DES ABSENCES PAR LABORATOIRE
+   Page "Suivi des absences", nouveau tableau "Suivi par laboratoire
+   (d'apres les QR scannes)". Une ligne par salle / laboratoire, avec :
+   effectif, nombre de scans QR (professeur + stagiaire), presences,
+   absences, retards, justifies, taux de presence, et la liste nommee
+   des absents pour chaque seance.
+   - Le filtre "Salle / Laboratoire" (en haut de la page) restreint le
+     tableau et le tableau par stagiaire a un seul laboratoire.
+   - Un stagiaire connecte ne voit que son propre laboratoire.
+   - Le bloc laboratoire est aussi ajoute a l'export CSV, a l'impression
+     et a l'export Word / PDF.
+   - Le regroupement utilise la salle attachee a la fiche du stagiaire.
+     Les stagiaires sans salle sont regroupes sous « — ».
+
+7. SAUVEGARDE DES DONNEES
+   Toutes les donnees sont stockees dans le navigateur (localStorage)
+   du poste qui les saisit. Exportez regulierement une sauvegarde JSON
+   (Stagiaires & QR > Exporter) et conservez-la en lieu sur.
+   Effacer les donnees du navigateur efface les enregistrements.
+
+8. SAUVEGARDE / RESTAURATION
+   - Export JSON : sauvegarde-integrale (stagiaires, specialty,
+     planning, feuilles d'appel, pointages, parametres).
+   - Import JSON : restaure une sauvegarde complete (remplace les
+     stagiaires).
+   - Parametres > Nouvelle annee : efface toutes les donnees.
+
+9. EXPORTS DISPONIBLES
+   - Feuille d'appel : impression, .doc, .pdf, (PDF via
+     "Enregistrer au format PDF" dans la fenetre d'impression).
+   - Suivi des absences : impression, .doc, .pdf, .csv
+     (le CSV contient aussi le bloc par laboratoire).
+   - QR Codes : planches imprimees, telechargement PNG individuel,
+     archive .zip du projet complet.
+
+10. LANGUES
+    L'interface est disponible en Francais, Arabe et Anglais
+    (boutons en haut de l'accueil et de l'en-tete).
+
+11. UTILISATION ET REDISTRIBUTION
+    Logiciel protege : voir LICENCE.md. Toute copie non autorisee est
+    interdite et detectable.
