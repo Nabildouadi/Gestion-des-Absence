@@ -112,8 +112,9 @@
       text-align: center;
     }
     .header-logo .logo-change span { font-size: 0.62rem; line-height: 1.2; }
-    body:not(.locked) .header-logo { cursor: pointer; }
-    body:not(.locked) .header-logo:hover .logo-change { opacity: 1; }
+    body.role-admin .header-logo { cursor: pointer; }
+    body.role-admin .header-logo:hover .logo-change { opacity: 1; }
+    body.role-admin .accueil-logo { cursor: pointer; }
 
     .header-profil { display: flex; flex-direction: column; align-items: center; }
 
@@ -850,7 +851,7 @@
           <div class="accueil-access-card" onclick="openAccueilLogin('stu')">
             <div class="accueil-access-icon"><i class="fas fa-user-graduate"></i></div>
             <div class="accueil-access-label" data-lang-key="access-stu">Accès Stagiaire</div>
-            <div class="accueil-access-sub" data-lang-key="access-stu-sub">Consulter son QR Code et son relevé d'absences</div>
+            <div class="accueil-access-sub" data-lang-key="access-stu-sub">Enregistrer sa présence (téléphone + mot de passe)</div>
           </div>
         </div>
 
@@ -925,7 +926,7 @@
           </div>
           <div class="login-error" id="stuError"></div>
           <button class="btn btn-success btn-block" onclick="stuConnexion()" data-lang-key="login-btn"><i class="fas fa-sign-in-alt"></i> Se connecter</button>
-          <p class="login-hint" data-lang-key="login-stu-hint">Saisissez votre <strong>numéro de téléphone</strong> puis votre <strong>mot de passe</strong>, attribué par le professeur.</p>
+          <p class="login-hint" data-lang-key="login-stu-hint">Saisissez votre <strong>numéro de téléphone</strong> puis votre <strong>mot de passe</strong> : votre <strong>présence est enregistrée</strong> immédiatement dans la feuille d'appel.</p>
 
           <div class="stu-qr-box">
             <div class="stu-qr-sep"><span data-lang-key="login-stu-or">— ou pointer directement —</span></div>
@@ -1461,6 +1462,8 @@
           <button class="btn btn-accent" onclick="projetTelechargerZip()"><i class="fas fa-file-archive"></i> <span data-lang-key="b-dl-zip">Télécharger le projet (.zip)</span></button>
           <button class="btn btn-danger" onclick="toutEffacer()"><i class="fas fa-eraser"></i> <span data-lang-key="b-nouvelle-annee">Nouvelle année (tout effacer)</span></button>
           <button class="btn btn-secondary" onclick="openLicence()"><i class="fas fa-file-contract"></i> <span data-lang-key="b-licence">Licence d'utilisation</span></button>
+          <button class="btn btn-secondary" onclick="liensReinitialiser()"><i class="fas fa-mobile-screen"></i> Réinitialiser les appareils liés</button>
+          <button class="btn btn-accent" onclick="appareilVerrouillerBasculer()"><i class="fas fa-shield-halved"></i> Verrouiller / ouvrir cet appareil (anti-copie)</button>
           <button class="btn btn-danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span data-lang-key="b-logout">Se déconnecter</span></button>
         </div>
       </section>
@@ -1566,6 +1569,24 @@
       Les marques de propriété intellectuelle du Logiciel ont été altérées : le fichier a été modifié, dupliqué ou amputé de ses mentions d'auteur.</p>
       <p>Merci de restaurer le fichier original et de contacter l'auteur pour toute copie autorisée :<br>
       <code>Salutation82nobl@gmail.com</code> — Tél. : +213 774 89 20 34</p>
+    </div>
+  </div>
+
+  <!-- ===== MODAL appareil non autorisé (anti-copie) ===== -->
+  <div class="modal-box" id="appareilModal">
+    <div class="modal-card">
+      <div class="modal-header blue"><i class="fas fa-shield-halved"></i> Appareil non autorisé</div>
+      <div class="modal-body">
+        <p>Cette application est verrouillée sur un autre appareil (protection anti-copie). Saisissez le mot de passe administrateur pour autoriser cet appareil.</p>
+        <div class="login-field">
+          <label><i class="fas fa-lock"></i> Mot de passe administrateur</label>
+          <input type="password" id="appareilPass" placeholder="••••••••">
+        </div>
+        <div class="login-error" id="appareilError"></div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" onclick="appareilAutoriser()"><i class="fas fa-unlock-alt"></i> Autoriser cet appareil</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -2281,7 +2302,7 @@
         'access-prof': 'Accès Professeur',
         'access-prof-sub': 'Espace enseignant : pointage, absences et statistiques',
         'access-stu': 'Accès Stagiaire',
-        'access-stu-sub': 'Consulter son QR Code et son relevé d\'absences',
+        'access-stu-sub': 'Enregistrer sa présence (téléphone + mot de passe)',
         'accueil-plage': '<b>Journées d\'appel :</b> Dimanche — Lundi — Mardi — Mercredi — Jeudi &nbsp;|&nbsp; <b>Horaires :</b> 08:00 – 10:00 · 10:00 – 12:00 · 13:00 – 15:00 · 15:00 – 16:30 &nbsp;|&nbsp; <b>Jeudi :</b> 08:00 – 10:00 · 10:00 – 12:00 uniquement',
         'accueil-info': '<i class="fas fa-qrcode" style="color:#4fc3f7;"></i>&nbsp; Cette plateforme gère les <strong>absences des stagiaires</strong> : <strong>entrée par scan du QR Code</strong>, <strong>feuille d\'appel</strong> par journée et créneau horaire, <strong>suivi des absences</strong>, statistiques, exports Word / PDF et impression.',
         'accueil-footer': 'Tous droits réservés © 2026 — <strong style="color:#b2dfdb;">Professeur Douadi Nabil</strong> · INSFP ELHidhab · Gestion des Absences<br>',
@@ -2298,7 +2319,7 @@
         'login-stu-title': '<i class="fas fa-user-graduate"></i> Accès Stagiaire',
         'login-stu-tel': '<i class="fas fa-phone"></i> Numéro de téléphone (identifiant)',
         'login-stu-pass': '<i class="fas fa-key"></i> Mot de passe',
-        'login-stu-hint': 'Saisissez votre <strong>numéro de téléphone</strong> puis votre <strong>mot de passe</strong>, attribué par le professeur.',
+        'login-stu-hint': 'Saisissez votre <strong>numéro de téléphone</strong> puis votre <strong>mot de passe</strong> : votre <strong>présence est enregistrée</strong> immédiatement dans la feuille d\'appel.',
         'login-stu-or': '— ou pointer directement —',
         'login-stu-qr-note': 'Présentez votre <strong>QR</strong> affiché à l\'écran : la présence est enregistrée <strong>directement dans la plateforme</strong>, avec la date et l\'heure.',
         'login-stu-qr-pass': 'Saisissez votre numéro de téléphone (ou vos 4 chiffres de mot de passe) pour valider ce QR Code.',
@@ -2318,7 +2339,7 @@
         'access-prof': 'ولوج الأستاذ',
         'access-prof-sub': 'فضاء الأستاذ: النقاط، الغيابات و الإحصائيات',
         'access-stu': 'ولوج المتربص',
-        'access-stu-sub': 'استعراض رمز QR و كشف الغيابات',
+        'access-stu-sub': 'تسجيل الحضور (رقم الهاتف + كلمة المرور)',
         'accueil-plage': '<b>أيام الحضور:</b> الأحد — الاثنين — الثلاثاء — الأربعاء — الخميس &nbsp;|&nbsp; <b>التوقيتات:</b> 08:00 – 10:00 · 10:00 – 12:00 · 13:00 – 15:00 · 15:00 – 16:30 &nbsp;|&nbsp; <b>الخميس:</b> 08:00 – 10:00 · 10:00 – 12:00 فقط',
         'accueil-info': '<i class="fas fa-qrcode" style="color:#4fc3f7;"></i>&nbsp; تدير هذه المنصة <strong>غيابات المتربصين</strong>: <strong>الدخول عبر مسح رمز QR</strong>، <strong>ورقة الحضور</strong> حسب اليوم والتوقيت، <strong>متابعة الغيابات</strong>، الإحصائيات، التصدير إلى Word / PDF و الطباعة.',
         'accueil-footer': 'جميع الحقوق محفوظة © 2026 — <strong style="color:#b2dfdb;">الأستاذ دوادي نبيل</strong> · INSFP ELHidhab · تدبير الغيابات<br>',
@@ -2335,7 +2356,7 @@
         'login-stu-title': '<i class="fas fa-user-graduate"></i> ولوج المتربص',
         'login-stu-tel': '<i class="fas fa-phone"></i> رقم الهاتف (المعرف)',
         'login-stu-pass': '<i class="fas fa-key"></i> كلمة المرور',
-        'login-stu-hint': 'اكتب <strong>رقم الهاتف</strong> ثم <strong>كلمة المرور</strong> حسب ما يحدده الأستاذ.',
+        'login-stu-hint': 'اكتب <strong>رقم الهاتف</strong> ثم <strong>كلمة المرور</strong>: يُسجَّل <strong>حضورك</strong> مباشرة في ورقة الاستدعاء.',
         'login-stu-or': '— أو مباشرة عبر الترميز —',
         'login-stu-qr-note': 'اعرض <strong>رمز QR</strong> المعروض على الشاشة: يُسجَّل الحضور <strong>مباشرة في المنصة</strong> مع التاريخ والساعة.',
         'login-stu-qr-pass': 'أدخل رقم هاتفك (أو كلمة المرور المكونة من 4 أرقام) لتأكيد رمز QR.',
@@ -2355,7 +2376,7 @@
         'access-prof': 'Teacher Access',
         'access-prof-sub': 'Teacher space: check-in, absences and statistics',
         'access-stu': 'Trainee Access',
-        'access-stu-sub': 'View your QR Code and your absence record',
+        'access-stu-sub': 'Record your attendance (phone + password)',
         'accueil-plage': '<b>Attendance days:</b> Sunday — Monday — Tuesday — Wednesday — Thursday &nbsp;|&nbsp; <b>Slots:</b> 08:00 – 10:00 · 10:00 – 12:00 · 13:00 – 15:00 · 15:00 – 16:30 &nbsp;|&nbsp; <b>Thursday:</b> 08:00 – 10:00 · 10:00 – 12:00 only',
         'accueil-info': '<i class="fas fa-qrcode" style="color:#4fc3f7;"></i>&nbsp; This platform manages <strong>trainee absences</strong>: <strong>entry by QR Code scan</strong>, <strong>attendance sheet</strong> per day and time slot, <strong>absence follow-up</strong>, statistics, Word / PDF exports and printing.',
         'accueil-footer': 'All rights reserved © 2026 — <strong style="color:#b2dfdb;">Professor Douadi Nabil</strong> · INSFP ELHidhab · Absence Management<br>',
@@ -2372,7 +2393,7 @@
         'login-stu-title': '<i class="fas fa-user-graduate"></i> Trainee Access',
         'login-stu-tel': '<i class="fas fa-phone"></i> Phone number (ID)',
         'login-stu-pass': '<i class="fas fa-key"></i> Password',
-        'login-stu-hint': 'Enter your <strong>phone number</strong> then your <strong>password</strong>, set by the teacher.',
+        'login-stu-hint': 'Enter your <strong>phone number</strong> then your <strong>password</strong>: your <strong>attendance is recorded</strong> immediately in the attendance sheet.',
         'login-stu-or': '— or check in directly —',
         'login-stu-qr-note': 'Present your <strong>QR</strong> displayed on screen: your attendance is recorded <strong>directly in the platform</strong>, with date and time.',
         'login-stu-qr-pass': 'Enter your phone number (or your 4-digit password) to validate this QR code.',
@@ -2451,10 +2472,75 @@
 
     // ===== Connexion =====
     let loginMode = 'prof';
+    let accueilLogoPending = null;
     const PAGES_PROF = ['page-stagiaires', 'page-scan', 'page-stats', 'page-parametres'];
     let pageCourante = 'page-stagiaires';
 
     function estStagiaire() { return sessionStorage.getItem(SESSION_TYPE_KEY) === 'stagiaire'; }
+    function estAdmin() { return sessionStorage.getItem(SESSION_TYPE_KEY) === 'admin'; }
+
+    // ===== Protection de l'identification (liaison à l'appareil) =====
+    const DEVICE_KEY = 'ga_appareil';
+    const LIENS_KEY = 'ga_liens';
+    const APPAREIL_LOCK_KEY = 'ga_verrou_appareil';
+    const APPAREIL_ACTIV_KEY = 'ga_appareil_autorise';
+
+    function deviceId() {
+      let id = null;
+      try { id = localStorage.getItem(DEVICE_KEY); } catch (e) {}
+      if (!id) {
+        id = 'dev-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+        try { localStorage.setItem(DEVICE_KEY, id); } catch (e) {}
+      }
+      return id;
+    }
+
+    function liensLire() { try { return JSON.parse(localStorage.getItem(LIENS_KEY)) || {}; } catch (e) { return {}; } }
+    function liensEcrire(o) { try { localStorage.setItem(LIENS_KEY, JSON.stringify(o)); } catch (e) {} }
+    function appareilLier(cle) { const o = liensLire(); o[cle] = deviceId(); liensEcrire(o); }
+    function appareilAutorise(cle) { const o = liensLire(); return !o[cle] || o[cle] === deviceId(); }
+
+    function liensReinitialiser() {
+      if (!estAdmin()) { showToast('Réservé à l\'administrateur', 'fas fa-lock', true); return; }
+      try { localStorage.removeItem(LIENS_KEY); } catch (e) {}
+      showToast('Tous les appareils liés ont été réinitialisés', 'fas fa-undo');
+    }
+
+    function appareilLockActif() { try { return localStorage.getItem(APPAREIL_LOCK_KEY) === '1'; } catch (e) { return false; } }
+    function appareilCeAutorise() { try { return localStorage.getItem(APPAREIL_ACTIV_KEY) === deviceId(); } catch (e) { return true; } }
+
+    function appareilVerrouillerBasculer() {
+      if (!estAdmin()) { showToast('Réservé à l\'administrateur', 'fas fa-lock', true); return; }
+      if (appareilLockActif()) {
+        try { localStorage.removeItem(APPAREIL_LOCK_KEY); localStorage.removeItem(APPAREIL_ACTIV_KEY); } catch (e) {}
+        showToast('Verrou d\'appareil retiré (anti-copie désactivée)', 'fas fa-unlock');
+      } else {
+        try { localStorage.setItem(APPAREIL_LOCK_KEY, '1'); localStorage.setItem(APPAREIL_ACTIV_KEY, deviceId()); } catch (e) {}
+        showToast('Application verrouillée sur cet appareil (anti-copie activée)', 'fas fa-lock');
+      }
+    }
+
+    function appareilVerifierDemarrage() {
+      if (!appareilLockActif() || appareilCeAutorise()) return true;
+      const m = document.getElementById('appareilModal');
+      if (m) { m.classList.add('show'); setTimeout(function() { const p = document.getElementById('appareilPass'); if (p) p.focus(); }, 80); }
+      return false;
+    }
+
+    function appareilAutoriser() {
+      const pass = document.getElementById('appareilPass').value.trim();
+      const err = document.getElementById('appareilError');
+      if (passHash(pass) === adminHash()) {
+        try { localStorage.setItem(APPAREIL_ACTIV_KEY, deviceId()); } catch (e) {}
+        document.getElementById('appareilModal').classList.remove('show');
+        document.getElementById('appareilPass').value = '';
+        err.textContent = '';
+        showToast('Appareil autorisé', 'fas fa-shield-halved');
+      } else {
+        err.textContent = '⚠ Mot de passe administrateur incorrect.';
+        document.getElementById('appareilPass').value = '';
+      }
+    }
 
     function adminUserName() {
       try {
@@ -2517,6 +2603,14 @@
         appliquerRole();
         switchAppPage('page-stagiaires');
         setTimeout(function() { showToast('Bienvenue, Professeur ' + settingsForm.profName + ' !', 'fas fa-user-shield'); }, 200);
+        if (accueilLogoPending) {
+          const c = accueilLogoPending;
+          accueilLogoPending = null;
+          setTimeout(function() {
+            const input = document.getElementById('accueilLogo' + (c === 'left' ? 'Left' : 'Right') + 'Input');
+            if (input) input.click();
+          }, 400);
+        }
       } else {
         errorEl.textContent = '⚠ Identifiant ou mot de passe incorrect.';
         document.getElementById('loginPass').value = '';
@@ -2577,12 +2671,25 @@
         document.getElementById('stuPass').value = '';
         return;
       }
-      stuSessionOuvrir(profil, false);
+      const cleLien = 'stu:' + tel;
+      if (!appareilAutorise(cleLien)) {
+        err.textContent = '⚠ Ce compte est déjà lié à un autre appareil. Demandez à l\'administrateur de réinitialiser les appareils.';
+        showToast('Identification liée à un autre appareil', 'fas fa-shield-halved', true);
+        return;
+      }
+      appareilLier(cleLien);
+      const r = stuPointageLogin(profil);
+      err.style.color = '#16a34a';
+      err.textContent = '✓ ' + r.msg + ' Vous pouvez fermer cette page.';
+      document.getElementById('stuTel').value = '';
+      document.getElementById('stuPass').value = '';
+      showToast(r.msg, 'fas fa-user-check');
     }
 
     function appliquerRole() {
       const stu = estStagiaire();
       document.body.classList.toggle('role-stu', stu);
+      document.body.classList.toggle('role-admin', estAdmin());
       document.querySelectorAll('#appPages .page-tab').forEach(function(t) {
         const roles = (t.dataset.role || 'prof').split(/\s+/);
         t.style.display = roles.indexOf(stu ? 'stu' : 'prof') !== -1 ? '' : 'none';
@@ -3908,6 +4015,13 @@
         stuPointerCible(s);
         return;
       }
+      if (stuScanBoite() === '2') {
+        const r = stuPointageLogin(s, APPEL_DATE, APPEL_CRENEAU || null);
+        stuScanMsg('✓ ' + r.msg);
+        appelRendre();
+        showToast(r.msg, 'fas fa-user-check');
+        return;
+      }
       stuScanArreter();
       stuScanEnAttente = s;
       document.getElementById('stuQrPassLbl').innerHTML = 'QR reconnu : <strong>' + escHtml(s.nom) + ' ' + escHtml(s.prenom || '') + '</strong> — ' + escHtml(stuTelLisible(s.tel)) + '.<br>' + escHtml(dico()['login-stu-qr-pass']);
@@ -3929,7 +4043,10 @@
       if (!ok) { err.textContent = '⚠ Numéro de téléphone ou mot de passe incorrect.'; return; }
       document.getElementById('stuQrPassBox').style.display = 'none';
       stuScanEnAttente = null;
-      stuPointerCible(s, true);
+      const r = stuPointageLogin(s);
+      err.style.color = '#16a34a';
+      err.textContent = '✓ ' + r.msg + ' Vous pouvez fermer cette page.';
+      showToast(r.msg, 'fas fa-user-check');
     }
 
     // ===== QR de séance (jeton signé, expire après 10 min) =====
@@ -4150,6 +4267,43 @@
       if (connecter) stuSessionOuvrir(s, true);
       scanRendre();
       showToast('Présence enregistrée : ' + s.nom + ' — ' + dateFr(SESSION_DATE) + ' ' + heureCourte(heureNow()) + (retard ? ' (retard)' : ''), 'fas fa-user-check');
+    }
+
+    // Enregistre la présence d'un stagiaire (sans ouvrir l'application)
+    function stuPointageLogin(s, jourOpt, creneauOpt) {
+      APPEL_STU_SCAN = false;
+      const jour = jourOpt || todayISO();
+      const creneau = (jourOpt === undefined)
+        ? ((jourIndex(jour) === -1) ? null : creneauCourant(jour))
+        : (creneauOpt || ((jourIndex(jour) === -1) ? null : creneauCourant(jour)));
+      if (!creneau) {
+        const deja = pointagesEx.filter(function(e) { return e.stuId === s.id && e.date === jour; })[0];
+        if (deja) return { deja: true, msg: 'Présence déjà enregistrée aujourd\'hui à ' + heureCourte(deja.heure) };
+        const heure = heureNow();
+        pointagesEx.unshift({
+          date: jour, heure: heure, ts: Date.now(),
+          stuId: s.id, code: s.code, nom: s.nom + ' ' + (s.prenom || ''),
+          salle: s.salle || '', source: 'login', externe: true
+        });
+        storeEcrire(POINTEX_KEY, pointagesEx);
+        scanBip();
+        scanExtRendre();
+        return { msg: 'Présence enregistrée le ' + dateFr(jour) + ' à ' + heureCourte(heure) + ' (hors créneau)' };
+      }
+      SESSION_DATE = jour;
+      SESSION_CRENEAU = creneau;
+      const list = seanceListe();
+      const deja = list.filter(function(p) { return p.stuId === s.id && p.ok; })[0];
+      if (deja) return { deja: true, msg: 'Présence déjà enregistrée à ' + heureCourte(deja.heure) };
+      const retard = scanEstRetard();
+      list.push(Object.assign({
+        code: s.code, stuId: s.id, nom: s.nom + ' ' + (s.prenom || ''),
+        ok: true, retard: retard, source: 'login', salle: s.salle || ''
+      }, scanHorodatage()));
+      seanceEcrire(list.slice(-200));
+      scanBip();
+      scanRendre();
+      return { msg: 'Présence enregistrée : ' + dateFr(jour) + ' — ' + creneau + (retard ? ' (retard)' : '') };
     }
 
     function pointageExAjouter(s) {
@@ -5438,12 +5592,13 @@
     }
 
     function changeLogo(cote) {
-      if (estStagiaire()) { showToast('Réservé à l\'administrateur', 'fas fa-lock', true); return; }
+      if (!estAdmin()) { showToast('Réservé à l\'administrateur — connectez-vous en admin.', 'fas fa-lock', true); return; }
       const input = document.getElementById(cote === 'Left' ? 'logoLeftFile' : 'logoRightFile');
       if (input) input.click();
     }
 
     function logoInputChange(cote, input) {
+      if (!estAdmin()) { input.value = ''; showToast('Réservé à l\'administrateur', 'fas fa-lock', true); return; }
       const file = input.files && input.files[0];
       input.value = '';
       if (!file) return;
@@ -5480,11 +5635,18 @@
     }
 
     function changeAccueilLogo(cote) {
+      if (!estAdmin()) {
+        accueilLogoPending = cote;
+        showToast('Logo modifiable par l\'administrateur — authentifiez-vous.', 'fas fa-lock', true);
+        openAccueilLogin('prof');
+        return;
+      }
       const input = document.getElementById('accueilLogo' + (cote === 'left' ? 'Left' : 'Right') + 'Input');
       if (input) input.click();
     }
 
     function accueilLogoChanged(cote, input) {
+      if (!estAdmin()) { input.value = ''; showToast('Réservé à l\'administrateur', 'fas fa-lock', true); return; }
       const file = input.files && input.files[0];
       if (!file) return;
       logoCompresser(file, function(dataUrl) {
@@ -5752,6 +5914,7 @@
       });
       appliquerRole();
       settingsVerrouiller(true);
+      appareilVerifierDemarrage();
       seanceInit();
       appelRendre();
       rendreTout();
